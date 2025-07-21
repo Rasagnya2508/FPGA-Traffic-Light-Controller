@@ -1,0 +1,34 @@
+module tb_traffic_controller;
+
+    reg clk;
+    reg reset;
+    reg [3:0] emergency;
+    wire [1:0] light_N, light_E, light_S, light_W;
+
+    traffic_controller uut (
+        .clk(clk),
+        .reset(reset),
+        .emergency(emergency),
+        .light_N(light_N),
+        .light_E(light_E),
+        .light_S(light_S),
+        .light_W(light_W)
+    );
+
+    initial begin
+        clk = 0; forever #5 clk = ~clk; // 100MHz Clock
+    end
+
+    initial begin
+        reset = 1; emergency = 4'b0000;
+        #20 reset = 0;
+
+        #100000000 emergency = 4'b0010; // Emergency from South
+        #200000000 emergency = 4'b0000;
+
+        #200000000 emergency = 4'b1000; // Emergency from West
+        #200000000 emergency = 4'b0000;
+
+        #500000000 $finish;
+    end
+endmodule

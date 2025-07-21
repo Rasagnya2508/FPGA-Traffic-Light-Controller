@@ -1,0 +1,44 @@
+module traffic_controller (
+    input clk,
+    input reset,
+    input [3:0] emergency, // [N,E,S,W]
+    output reg [1:0] light_N,
+    output reg [1:0] light_E,
+    output reg [1:0] light_S,
+    output reg [1:0] light_W
+);
+
+    reg [3:0] state;
+    reg [31:0] timer;
+
+    parameter RED = 2'b00, YELLOW = 2'b01, GREEN = 2'b10;
+    parameter T_MAX = 100000000; // Time period to hold green (~1 sec @100MHz)
+
+    parameter N = 0, E = 1, S = 2, W = 3;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= N;
+            timer <= 0;
+            light_N <= RED; light_E <= RED; light_S <= RED; light_W <= RED;
+        end else begin
+            timer <= timer + 1;
+
+            // Priority check
+            if (emergency[N]) state <= N;
+            else if (emergency[E]) state <= E;
+            else if (emergency[S]) state <= S;
+            else if (emergency[W]) state <= W;
+            else if (timer >= T_MAX) begin
+                state <= (state + 1) % 4;
+                timer <= 0;
+            end
+
+            // Set signals
+            light_N <= (state == N) ? GREEN : RED;
+            light_E <= (state == E) ? GREEN : RED;
+            light_S <= (state == S) ? GREEN : RED;
+            light_W <= (state == W) ? GREEN : RED;
+        end
+    end
+endmodule
