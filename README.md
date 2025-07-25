@@ -22,4 +22,4 @@ This project implements a smart traffic light controller using Verilog on a Xili
 
 ## Author
 Bende Rasagnya  
-Final Year ECE Student, Malla Reddy College  
+Final Year ECE Student, Malla Reddy College of Engineering and Technology
